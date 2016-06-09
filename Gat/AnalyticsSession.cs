@@ -16,14 +16,8 @@
             analyticsClient = new AnalyticsClient(domain, trackingCode, userRandomNumber, visitCount, firstVisitTimeStamp);
         }
 
-        public IAnalyticsPageViewRequest CreatePageViewRequest(string page, string title)
-        {
-            return new AnalyticsPageViewRequest(analyticsClient, page, title);
-        }
+        public IAnalyticsPageViewRequest CreatePageViewRequest(string page, string title) => new AnalyticsPageViewRequest(analyticsClient, page, title);
 
-        public void SetCustomVariable(int position, string key, string value)
-        {
-            analyticsClient.SetCustomVariable(position, key, value);
-        }
+        public void SetCustomVariable(int position, string key, string value) => analyticsClient.SetCustomVariable(position, key, value);
     }
 }

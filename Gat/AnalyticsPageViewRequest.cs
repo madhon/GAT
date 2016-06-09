@@ -15,24 +15,12 @@
             customVariables = new VariableBucket();
         }
 
-        public void Send()
-        {
-            analyticsClient.SubmitPageView(page, title, customVariables);
-        }
+        public void Send() => analyticsClient.SubmitPageView(page, title, customVariables);
 
-        public void SendEvent(string category, string action, string label, string value)
-        {
-            analyticsClient.SubmitEvent(page, title, category, action, label, value, customVariables);
-        }
+        public void SendEvent(string category, string action, string label, string value) => analyticsClient.SubmitEvent(page, title, category, action, label, value, customVariables);
 
-        public void SetCustomVariable(int position, string key, string value)
-        {
-            customVariables.Set(position, key, value);
-        }
+        public void SetCustomVariable(int position, string key, string value) => customVariables.Set(position, key, value);
 
-        public void ClearCustomVariable(int position)
-        {
-            customVariables.Clear(position);
-        }
+        public void ClearCustomVariable(int position) => customVariables.Clear(position);
     }
 }

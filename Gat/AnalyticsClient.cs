@@ -5,6 +5,7 @@
     using System.Reflection;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     internal class AnalyticsClient : IAnalyticsClient
     {
@@ -101,10 +102,12 @@
                 //    client.QueryString["utme"] += variables.ToUtme();    
             }
 
-            ThreadPool.QueueUserWorkItem(state =>
-            {
-                client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative));
-            });
+            Task.Run(() => client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative)));
+
+            //ThreadPool.QueueUserWorkItem(state =>
+            //{
+            //    client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative));
+            //});
         }
 
         public void SetCustomVariable(int position, string key, string value)
@@ -120,13 +123,16 @@
         private static string GetDefaultUserAgent()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"Appalytics v{version.Major}.{version.Minor}";
+            return $"GAT v{version.Major.ToString()}.{version.Minor.ToString()}";
         }
 
         private WebClient CreateBrowser(string page, string title)
         {
             Random randomNumber = new Random();
-            WebClient client = new WebClient();
+
+            var proxy = WebRequest.GetSystemWebProxy();
+            WebClient client = new WebClient { Proxy = proxy };
+
             client.Headers.Add(HttpRequestHeader.UserAgent, GetDefaultUserAgent());
             client.BaseAddress = "http://www.google-analytics.com/";
 
@@ -194,11 +200,11 @@
 
         private string GetCookieString()
         {
-            string utma = $"{DomainHash}.{RandomNumber}.{FirstSessionTimestamp}.{Timestamp}.{Timestamp}.{VisitCount}"; // total visit count
+            string utma = $"{DomainHash.ToString()}.{RandomNumber}.{FirstSessionTimestamp}.{Timestamp}.{Timestamp}.{VisitCount.ToString()}"; // total visit count
 
             //referral information
             string utmz =
-                $"{DomainHash}.{Timestamp}.{"1"}.{"1"}.utmcsr={ReferralSource}|utmccn={Campaign}|utmcmd={Medium}";
+                $"{DomainHash.ToString()}.{Timestamp}.{"1"}.{"1"}.utmcsr={ReferralSource}|utmccn={Campaign}|utmcmd={Medium}";
 
             string utmcc = Uri.EscapeDataString($"__utma={utma};+__utmz={utmz};");
 
