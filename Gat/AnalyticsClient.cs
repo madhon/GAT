@@ -4,7 +4,6 @@
     using System.Net;
     using System.Reflection;
     using System.Text;
-    using System.Threading;
     using System.Threading.Tasks;
 
     internal class AnalyticsClient : IAnalyticsClient
@@ -15,7 +14,7 @@
         private const string Medium = "(none)";
         private const string Campaign = "(direct)";
         private string domain;
-
+        
         /// <summary>
         /// Use for non persisted user session mode (Does not guarantee uniqueness of users)
         /// </summary>
@@ -48,7 +47,7 @@
 
         public string Domain
         {
-            get { return domain; }
+            get => domain;
             set
             {
                 domain = value;
@@ -74,18 +73,7 @@
             if (variables.Any())
                 client.QueryString["utme"] = variables.ToUtme();
 
-            ThreadPool.QueueUserWorkItem(state =>
-            {
-                try
-                {
-                    client.DownloadData(new Uri("__utm.gif", UriKind.Relative));
-                }
-                // ReSharper disable once EmptyGeneralCatchClause
-                catch
-                {
-
-                }
-            });
+            Task.Run(() => client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative)));
         }
 
         public void SubmitEvent(string page, string title, string category, string action, string label, string value, VariableBucket pageVariables)
@@ -103,11 +91,6 @@
             }
 
             Task.Run(() => client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative)));
-
-            //ThreadPool.QueueUserWorkItem(state =>
-            //{
-            //    client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative));
-            //});
         }
 
         public void SetCustomVariable(int position, string key, string value)
@@ -122,7 +105,9 @@
 
         private static string GetDefaultUserAgent()
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            var asm = typeof(AnalyticsClient).GetTypeInfo().Assembly;
+            var version = asm.GetName().Version;
             return $"GAT v{version.Major.ToString()}.{version.Minor.ToString()}";
         }
 
@@ -204,7 +189,7 @@
 
             //referral information
             string utmz =
-                $"{DomainHash.ToString()}.{Timestamp}.{"1"}.{"1"}.utmcsr={ReferralSource}|utmccn={Campaign}|utmcmd={Medium}";
+                $"{DomainHash.ToString()}.{Timestamp}.1.1.utmcsr={ReferralSource}|utmccn={Campaign}|utmcmd={Medium}";
 
             string utmcc = Uri.EscapeDataString($"__utma={utma};+__utmz={utmz};");
 
