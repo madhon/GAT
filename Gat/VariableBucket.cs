@@ -43,10 +43,7 @@
             return new VariableBucket(variables);
         }
 
-        public bool Any()
-        {
-            return Variables.Any(v => v != null);
-        }
+        public bool Any() => Variables.Any(v => v != null);
 
         public string ToUtme()
         {
@@ -58,9 +55,6 @@
                    string.Join("*", Variables.Where(v => v != null).Select(kvp => "1").ToArray());
         }
 
-        public void Clear(int position)
-        {
-            Variables[position - 1] = null;
-        }
+        public void Clear(int position) => Variables[position - 1] = null;
     }
 }

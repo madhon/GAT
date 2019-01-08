@@ -54,6 +54,7 @@
                 DomainHash = CalculateDomainHash(value);
             }
         }
+
         public string TrackingCode { get; set; }
         public string Timestamp { get; set; }
         public string FirstSessionTimestamp { get; set; }
@@ -93,19 +94,12 @@
             Task.Run(() => client.DownloadDataAsync(new Uri("__utm.gif", UriKind.Relative)));
         }
 
-        public void SetCustomVariable(int position, string key, string value)
-        {
-            sessionVariables.Set(position, key, value);
-        }
+        public void SetCustomVariable(int position, string key, string value) => sessionVariables.Set(position, key, value);
 
-        public void ClearCustomVariable(int position)
-        {
-            sessionVariables.Clear(position);
-        }
+        public void ClearCustomVariable(int position) => sessionVariables.Clear(position);
 
         private static string GetDefaultUserAgent()
         {
-
             var asm = typeof(AnalyticsClient).GetTypeInfo().Assembly;
             var version = asm.GetName().Version;
             return $"GAT v{version.Major.ToString()}.{version.Minor.ToString()}";
@@ -145,20 +139,21 @@
             builder.AppendFormat("5({0}*{1}", EncodeUtmePart(category), EncodeUtmePart(action));
 
             if (!string.IsNullOrEmpty(label))
+            {
                 builder.AppendFormat("*{0}", EncodeUtmePart(label));
+            }
 
             builder.Append(")");
 
             if (!string.IsNullOrEmpty(value))
+            {
                 builder.AppendFormat("({0})", EncodeUtmePart(value));
+            }
 
             return builder.ToString();
         }
 
-        internal static string EncodeUtmePart(string part)
-        {
-            return part.Replace("'", "'0").Replace(")", "'1").Replace("*", "'2");
-        }
+        internal static string EncodeUtmePart(string part) => part.Replace("'", "'0").Replace(")", "'1").Replace("*", "'2");
 
         private static int ConvertToUnixTimestamp(DateTime value)
         {
